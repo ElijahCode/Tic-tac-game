@@ -13,7 +13,7 @@ const GameFiledConnector = connect(mapStateToProps);
   
 type IGameFiledProps = ConnectedProps<typeof GameFiledConnector>;
 
-export class GameField extends React.Component<IGameFiledProps, IState> {
+class GameFieldWithoutConnect extends React.Component<IGameFiledProps, IState> {
     state = {
         isActive: this.props.isActive,
         gameField: this.props.gameField,
@@ -48,3 +48,5 @@ export class GameField extends React.Component<IGameFiledProps, IState> {
         return layout;
     }
 }
+
+export const GameFiled = GameFiledConnector(GameFieldWithoutConnect)
