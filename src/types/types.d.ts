@@ -1,19 +1,17 @@
 interface User {
-    name: string;
+  name: string;
 }
 
-type CellValue = '' | 'X' | 'O';
+type CellValue = "" | "X" | "O";
 
-type userRole = {
-    crossPlayer: 0,
-    zeroPlayer: 1,
-    watcher: 2
-}
+type userRole = "cross" | "zero" | "watcher";
 
 interface IState {
-    isActive: boolean;
-    gameField: [number[], number[], number[]];
-    players: [User, User];
-    userRole: userRole['crossPlayer'] | userRole['zeroPlayer'] | userRole['watcher'];
-    watchers: User[];
+  isActive: boolean;
+  gameField: [CellValue[], CellValue[], CellValue[]];
+  currentPlayer: User;
+  players: [User, User];
+  userRole: userRole;
+  watchers: User[];
+  winner: User | "none" | "Draw";
 }

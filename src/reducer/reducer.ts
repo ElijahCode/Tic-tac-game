@@ -1,65 +1,92 @@
 import { createReducer } from "@reduxjs/toolkit";
-import { setState, updateIsActive,updateStateGameFiled, updateStatePlayers, updateStateUserRole, updateStateWatchers } from './action'
-import { createStateClone } from '../createStateClone/createCloneState'
+import {
+  setState,
+  updateIsActive,
+  updateStateGameFiled,
+  updateStateCurrentPlayer,
+  updateStatePlayers,
+  updateStateUserRole,
+  updateStateWatchers,
+  updateStateWinner,
+} from "./action";
+import { createStateClone } from "../createStateClone/createCloneState";
 
 const initState: IState = {
-    isActive: true,
-    gameField: [
-        [0, 0, 0],
-        [0, 0, 0],
-        [0, 0, 0]
-    ],
-    players: [{name: ''}, {name: ''}],
-    userRole: 0,
-    watchers: []
-}
+  isActive: true,
+  gameField: [
+    ["", "", ""],
+    ["", "", ""],
+    ["", "", ""],
+  ],
+  currentPlayer: { name: "" },
+  players: [{ name: "" }, { name: "" }],
+  userRole: "watcher",
+  watchers: [],
+  winner: "none",
+};
 
 export const reducer = createReducer(initState, (builder) => {
-    builder
-        .addCase(setState, (state: IState, action) => action.payload)
-        .addCase(updateStateGameFiled, (state: IState, action) => {
-            const newState = createStateClone(state);
-        
-            const newGameField = action.payload;
+  builder
+    .addCase(setState, (state: IState, action) => action.payload)
+    .addCase(updateStateGameFiled, (state: IState, action) => {
+      const newState = createStateClone(state);
 
-            newState.gameField = newGameField;
+      const newGameField = action.payload;
 
-            return newState;
-        })
-        .addCase(updateIsActive, (state: IState, action) => {
-            const newState = createStateClone(state);
+      newState.gameField = newGameField;
 
-            const newIsActive = !(state.isActive);
+      return newState;
+    })
+    .addCase(updateIsActive, (state: IState) => {
+      const newState = createStateClone(state);
 
-            newState.isActive = newIsActive;
+      const newIsActive = !state.isActive;
 
-            return newState;
-        })
-        .addCase(updateStatePlayers, (state: IState, action) => {
-            const newState = createStateClone(state);
-        
-            const newPlayers = action.payload;
+      newState.isActive = newIsActive;
 
-            newState.players = newPlayers;
+      return newState;
+    })
+    .addCase(updateStateCurrentPlayer, (state: IState, action) => {
+      const newState = createStateClone(state);
 
-            return newState;
-        })
-        .addCase(updateStateUserRole, (state: IState, action) => {
-            const newState = createStateClone(state);
+      newState.currentPlayer = action.payload;
 
-            const newUserRole = action.payload;
+      return newState;
+    })
+    .addCase(updateStatePlayers, (state: IState, action) => {
+      const newState = createStateClone(state);
 
-            newState.userRole = newUserRole;
+      const newPlayers = action.payload;
 
-            return newState;
-        })
-        .addCase(updateStateWatchers, (state: IState, action) => {
-            const newState = createStateClone(state);
-        
-            const newWatchers = action.payload;
+      newState.players = newPlayers;
 
-            newState.watchers = newWatchers;
+      return newState;
+    })
+    .addCase(updateStateUserRole, (state: IState, action) => {
+      const newState = createStateClone(state);
 
-            return newState;
-        })
-})
+      const newUserRole = action.payload;
+
+      newState.userRole = newUserRole;
+
+      return newState;
+    })
+    .addCase(updateStateWatchers, (state: IState, action) => {
+      const newState = createStateClone(state);
+
+      const newWatchers = action.payload;
+
+      newState.watchers = newWatchers;
+
+      return newState;
+    })
+    .addCase(updateStateWinner, (state: IState, action) => {
+      const newState = createStateClone(state);
+
+      const winner = action.payload;
+
+      newState.winner = winner;
+
+      return newState;
+    });
+});
