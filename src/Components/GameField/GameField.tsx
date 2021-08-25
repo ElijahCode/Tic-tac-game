@@ -7,6 +7,7 @@ import {
   updateStatePlayers,
   updateStateUserRole,
   updateStateWatchers,
+  updateStateWinner,
 } from "../../reducer/action";
 import { createStateClone } from "../../createStateClone/createCloneState";
 
@@ -35,6 +36,7 @@ const mapDispatchToProps = {
   updateStatePlayers,
   updateStateUserRole,
   updateStateWatchers,
+  updateStateWinner,
 };
 
 const GameFieldConnector = connect(mapStateToProps, mapDispatchToProps);
@@ -56,17 +58,20 @@ class GameFieldWithoutConnect extends React.Component<IGameFiledProps, IState> {
     if (
       this.state.userRole === "watcher" ||
       !this.state.isActive ||
-      this.state.winner !== "none"
+      this.state.winner !== "none" ||
+      (event.target as HTMLTableCellWithKey).innerHTML !== ""
     ) {
       return;
     }
 
-    const cellIndex = (event.target as HTMLTableCellWithKey).key;
-    const rowIndex = (
-      (event.target as HTMLTableCellWithKey).closest(
-        "tr"
-      ) as HTMLTableRowWithKey
-    ).key;
+    const cellIndex = Number((event.target as HTMLTableCellWithKey).id);
+    const rowIndex = Number(
+      (
+        (event.target as HTMLTableCellWithKey).closest(
+          "tr"
+        ) as HTMLTableRowWithKey
+      ).id
+    );
 
     const newGameField = createStateClone(this.state).gameField;
     newGameField[rowIndex][cellIndex] =
@@ -80,7 +85,7 @@ class GameFieldWithoutConnect extends React.Component<IGameFiledProps, IState> {
       isActive: false,
     });
 
-    this.isGameEnd();
+    this.isGameEnd(newGameField);
   };
 
   onResetButtonClick = () => {
@@ -96,11 +101,11 @@ class GameFieldWithoutConnect extends React.Component<IGameFiledProps, IState> {
     });
   };
 
-  isGameEnd(): void {
+  isGameEnd(inputGameField: IState["gameField"]): void {
     let isPlayerWin = false;
     const userSign = this.state.userRole === "cross" ? "X" : "O";
 
-    const { gameField } = this.state;
+    const gameField = inputGameField;
 
     gameField.forEach((row: CellValue[]) => {
       const isAllCellContainsUserSign: boolean = row.every(
@@ -139,6 +144,7 @@ class GameFieldWithoutConnect extends React.Component<IGameFiledProps, IState> {
     });
 
     if (isPlayerWin) {
+      this.props.updateStateWinner(this.state.currentPlayer);
       this.setState({
         winner: this.state.currentPlayer,
       });
@@ -150,6 +156,7 @@ class GameFieldWithoutConnect extends React.Component<IGameFiledProps, IState> {
         .concat(gameField[1], gameField[2])
         .filter((cell: CellValue) => cell === "").length === 0;
     if (isDraw) {
+      this.props.updateStateWinner("Draw");
       this.setState({
         winner: "Draw",
       });
@@ -158,29 +165,32 @@ class GameFieldWithoutConnect extends React.Component<IGameFiledProps, IState> {
 
   render(): JSX.Element {
     const layout = (
-      <div>
-        <div>
-          <p>{`${this.state.players[0]}`}</p>
+      <div data-testid="gameFieldBlockMain">
+        <div data-testid="playerVersusBlock">
+          <p>{`${this.state.players[0].name}`}</p>
           <p> vs </p>
-          <p>{`${this.state.players[1]}`}</p>
+          <p>{`${this.state.players[1].name}`}</p>
         </div>
         {this.state.winner !== "none" && this.state.winner !== "Draw" && (
-          <div>
+          <div data-testid="winnerBlock">
             <p>{`${this.state.winner.name}`} is winner!!!</p>
           </div>
         )}
         {this.state.winner === "Draw" && (
-          <div>
+          <div data-testid="drawBlock">
             <p>The game ended in a draw</p>
           </div>
         )}
-        <table onClick={this.onTableClick}>
+        <table onClick={this.onTableClick} data-testid="gameFieldTable">
           <tbody>
             {this.state.gameField.map((row, rowIndex) => {
               const rowLayout = (
-                <tr key={`${rowIndex}`}>
+                <tr key={`${rowIndex}`} id={`${rowIndex}`}>
                   {row.map((cell, cellIndex) => (
-                    <td key={`${cellIndex}`}>{`${cell}`}</td>
+                    <td
+                      key={`${cellIndex}`}
+                      id={`${cellIndex}`}
+                    >{`${cell}`}</td>
                   ))}
                 </tr>
               );
@@ -189,11 +199,13 @@ class GameFieldWithoutConnect extends React.Component<IGameFiledProps, IState> {
           </tbody>
         </table>
         {this.state.userRole !== "watcher" && this.state.winner !== "none" && (
-          <button onClick={this.onResetButtonClick}>New Game</button>
+          <button onClick={this.onResetButtonClick} data-testid="resetButton">
+            New Game
+          </button>
         )}
-        <ol>
+        <ol data-testid="watchersList">
           {this.state.watchers.map((watcher, index) => (
-            <ul key={`${index}`}>{`${watcher}`}</ul>
+            <ul key={`${index}`}>{`${watcher.name}`}</ul>
           ))}
         </ol>
       </div>
@@ -202,4 +214,4 @@ class GameFieldWithoutConnect extends React.Component<IGameFiledProps, IState> {
   }
 }
 
-export const GameFiled = GameFieldConnector(GameFieldWithoutConnect);
+export const GameField = GameFieldConnector(GameFieldWithoutConnect);

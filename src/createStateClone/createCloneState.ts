@@ -1,4 +1,6 @@
 export function createStateClone(state: IState): IState {
+  const winner =
+    typeof state.winner === "string" ? state.winner : { ...state.winner };
   return {
     isActive: state.isActive,
     gameField: [
@@ -6,6 +8,7 @@ export function createStateClone(state: IState): IState {
       [...state.gameField[1]],
       [...state.gameField[2]],
     ],
+    currentPlayer: { ...state.currentPlayer },
     players: [{ ...state.players[0] }, { ...state.players[1] }],
     userRole: state.userRole,
     watchers: [
@@ -13,5 +16,6 @@ export function createStateClone(state: IState): IState {
         ...watcher,
       })),
     ],
+    winner,
   };
 }
