@@ -6,7 +6,7 @@ export class Loader extends React.Component<
 > {
   render(): JSX.Element {
     return (
-      <div>
+      <div data-testid="loader_block">
         <p>Loading...</p>
       </div>
     );
